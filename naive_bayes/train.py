@@ -14,7 +14,7 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 #cvs파일로 non-dataset 불러오기 
-f = open('train_non_negative.csv', encoding = 'UTF-8')
+f = open('/Users/ahn_euijin/lab/naive_bayes/train_non_negative.csv', encoding = 'UTF-8')
 data_non = csv.reader(f)
 
 #cvs파일 정제하기 위해 list로 받아오기
@@ -24,7 +24,7 @@ for row in data_non:
 f.close()
 
 #cvs파일로 negative-dataset 불러오기 
-d = open('train_negative.csv', encoding = 'UTF-8')
+d = open('/Users/ahn_euijin/lab/naive_bayes/train_negative.csv', encoding = 'UTF-8')
 data_negative = csv.reader(d)
 
 #cvs파일 정제하기 위해 list로 받아오기
