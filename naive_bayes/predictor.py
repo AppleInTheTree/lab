@@ -9,34 +9,49 @@ from nltk.corpus import stopwords # stopword 제거 위해
 import re # 정규식
 from nltk.tokenize import word_tokenize # dataset tokenizing 
 from nltk.stem import PorterStemmer # libstemmer같은 stemming tool 
+import train
 
 nltk.download('stopwords')
 nltk.download('punkt')
 
-#cvs파일로 non-dataset 불러오기 
-f = open('test_non_negative.csv', encoding = 'UTF-8')
-data_non = csv.reader(f)
+#test data 불러오기
+f = open('/Users/ahn_euijin/lab/naive_bayes/test_non_negative.csv', encoding = 'UTF-8')
+train_data_non = csv.reader(f)
 
-#cvs파일 정제하기 위해 list로 받아오기
-list_data_non =[]
-for row in data_non:
-  list_data_non += row
-f.close()
+f = open('/Users/ahn_euijin/lab/naive_bayes/test_negative.csv', encoding = 'UTF-8')
+train_data_negative = csv.reader(f)
 
-#cvs파일로 negative-dataset 불러오기 
-d = open('test_negative.csv', encoding = 'UTF-8')
-data_negative = csv.reader(d)
-
-#cvs파일 정제하기 위해 list로 받아오기
-list_data_negative = []
-for low in data_negative:
-  list_data_negative += low
-
-d.close()
+train_list_data_non = train.list_data(train_data_non)
+train_list_data_nagative = train.list_data(train_data_negative)
 
 
-def predictor(test_data):
-    for row in test_data:
-        
+def train_model(test_data):
+      non_count = 1
+      negative_count = 1
+      non_sum = 0
+      negative_sum = 0
+      #count = 0
+      for list in test_data:
+            a = train.short(list)
+            b = word_tokenize(a)
+            c = train.tokenizer(b)
 
-        pass
+            for word in list:
+                  if word in train.train_merge.keys():
+                        non_sum += train.train_merge[word][0]
+                        negative_sum += train.train_merge[word][1]
+            if non_sum >=negative_sum:
+                  non_count += 1
+            else:
+                  negative_count += 1
+      
+      return non_count, negative_count
+  
+# def probability(data1, data2):
+#   return print("%.0f%%" % (100 * abs(data2/data1))) 
+
+# non_count , negative_count = train_model(train_list_data_nagative)
+
+# probability(non_count, negative_count)
+print(train_model(train_list_data_non))
+print(train_model(train_list_data_nagative))
