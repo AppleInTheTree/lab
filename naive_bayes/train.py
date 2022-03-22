@@ -17,48 +17,50 @@ nltk.download('punkt')
 f = open('/Users/ahn_euijin/lab/naive_bayes/train_non_negative.csv', encoding = 'UTF-8')
 data_non = csv.reader(f)
 
-#cvs파일 정제하기 위해 list로 받아오기
-list_data_non =[]
-for row in data_non:
-  list_data_non += row
-f.close()
-
 #cvs파일로 negative-dataset 불러오기 
 d = open('/Users/ahn_euijin/lab/naive_bayes/train_negative.csv', encoding = 'UTF-8')
 data_negative = csv.reader(d)
 
 #cvs파일 정제하기 위해 list로 받아오기
-list_data_negative = []
-for low in data_negative:
-  list_data_negative += low
+def list_data(data):
+      listed_data =[]
 
-d.close()
+      for row in data:
+            listed_data+=row
+      return listed_data
 
-#정규식 이용하여 1,2자리수 영어 단어 삭제
-shortword = re.compile(r'\W*\b\w{1,2}\b')
-first_short_non = shortword.sub('',str(list_data_non))
-first_short_negative = shortword.sub('',str(list_data_negative))
+list_data_non = list_data(data_non)
+list_data_negative = list_data(data_negative)
 
-#특수문자 삭제
-second_short_non = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]','', first_short_non)
-second_short_negative = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]','', first_short_negative)
-#stopword 삭제 
-stop_words_list = stopwords.words('english')
+#정규식 이용하여 1,2자리수 영어 단어 삭제 & 특수 문자 삭제
+def short(word):
+      shortword = shortword = re.compile(r'\W*\b\w{1,2}\b')
+      a = shortword.sub('',str(word))
+      b = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]','', a)
+      return b
+
+shortword_non = short(list_data_non)
+shortword_negative = short(list_data_negative)
 
 #tokenize툴로 정규화된 문자 토큰화 
-tokenizer_non = word_tokenize(second_short_non)
-tokenizer_negative = word_tokenize(second_short_negative)
+tokenizer_non = word_tokenize(shortword_non)
+tokenizer_negative = word_tokenize(shortword_negative)
 
+#stopword를 제거해주고 데이터 정제
+def tokenizer(token):
+      #stop word list 
+      stop_words_list = stopwords.words('english')
+      result_data = []
+
+      for word in token:
+        if word not in stop_words_list:
+          result_data.append(word) 
+      return result_data
+
+    
 #정제된 데이터 results에 반환 
-results_non =[]
-results_negative =[]
-for word in tokenizer_non:
-  if word not in stop_words_list:
-    results_non.append(word) 
-
-for words in tokenizer_negative:
-  if words not in stop_words_list:
-    results_negative.append(words) 
+results_non = tokenizer(tokenizer_non)
+results_negative =tokenizer(tokenizer_negative)
 
 #colletion.Counter 함수 이용하여 각 단어의 빈수도 확인 
 counter_non = collections.Counter(results_non)
@@ -66,36 +68,39 @@ counter_negative = collections.Counter(results_negative)
 
 dict_counter_non = dict(counter_non)
 dict_counter_negative = dict(counter_negative)
-#print(len(results_non))
-#print(dict_counter_non)
 
 #voca reduction 딕셔너리 언팩킹을 통해 빈수도 3 미만 삭제
-precise_count_non = {}
-precise_count_negative = {}
+def voca_reduction(dict_counted):
+      precise_count = {}
 
-for key, value in dict_counter_non.items():
-  if value >= 3:
-    precise_count_non[key] = value
+      for key, value in dict_counted.items():
+        if value >= 3:
+          precise_count[key] = value
+      return precise_count
 
-for key, value in dict_counter_negative.items():
-  if value >= 3:
-    precise_count_negative[key] = value
+precise_count_non = voca_reduction(dict_counter_non)
+precise_count_negative = voca_reduction(dict_counter_negative)
 
 #마지막 정제된 데이터 리스트 생성
-final_data_non = dict_counter_non.keys()
-final_data_negative = dict_counter_negative.keys()
+# final_data_non = dict_counter_non.keys()
+# final_data_negative = dict_counter_negative.keys()
 
-merge_dict =collections.defaultdict(list)
+# non과 negative 데이터 합치기 
+def merge(dict_non, dict_negative):
+      merge_dict =collections.defaultdict(list)
 
-for data in (precise_count_non, precise_count_negative): 
-    for key, value in data.items():
-        merge_dict[key].append(value)
+      for data in (dict_non, dict_negative): 
+          for key, value in data.items():
+              merge_dict[key].append(value)
+      return merge_dict
+
+merged_dict = merge(precise_count_non, precise_count_negative)
 
 #print(merge_dict)
 
 #making dataframe using pandas
 col_names = ["non_negative", "negative"]
-df = pd.DataFrame.from_dict(merge_dict, orient='index', columns=col_names)
+df = pd.DataFrame.from_dict(merged_dict, orient='index', columns=col_names)
 
 # Nan value 제거 (smoothing)
 df_filled  = df.fillna(1)
@@ -111,13 +116,53 @@ df_negative_stat = df_filled['negative'] / df_filled['sum']
 df_filled.insert(3, "non_stat",df_non_stat,True)
 df_filled.insert(4, "negative_stat",df_negative_stat,True)
 
+neg_dict = dict(zip(df_filled.index, df_filled.negative_stat))
+non_dict = dict(zip(df_filled.index, df_filled.non_stat))
+train_merge = merge(non_dict, neg_dict)
 
-print(df_filled)
+#test data 불러오기
+f = open('/Users/ahn_euijin/lab/naive_bayes/test_non_negative.csv', encoding = 'UTF-8')
+train_data_non = csv.reader(f)
+
+f = open('/Users/ahn_euijin/lab/naive_bayes/test_negative.csv', encoding = 'UTF-8')
+train_data_negative = csv.reader(f)
+
+train_list_data_non = list_data(train_data_non)
+train_list_data_nagative = list_data(train_data_negative)
 
 
+def train_model(test_data):
+      non_count = 1
+      negative_count = 1
+      non_sum = 0
+      negative_sum = 0
+      #count = 0
+      for list in test_data:
+            a = short(list)
+            b = word_tokenize(a)
+            c = tokenizer(b)
 
+            for word in list:
+                  if word in train_merge.keys():
+                        non_sum += train_merge[word][0]
+                        negative_sum += train_merge[word][1]
+            if non_sum >=negative_sum:
+                  non_count += 1
+            else:
+                  negative_count += 1
+      
+      return non_count, negative_count
+  
+# def probability(data1, data2):
+#   return print("%.0f%%" % (100 * abs(data2/data1))) 
 
+# non_count , negative_count = train_model(train_list_data_nagative)
 
+# probability(non_count, negative_count)
+print(train_model(train_list_data_non))
+print(train_model(train_list_data_nagative))
+
+      
 
 
 
