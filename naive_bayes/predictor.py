@@ -21,10 +21,11 @@ train_data_non = csv.reader(f)
 f = open('/Users/ahn_euijin/lab/naive_bayes/test_negative.csv', encoding = 'UTF-8')
 train_data_negative = csv.reader(f)
 
+#test데이터 list화 시키기
 train_list_data_non = train.list_data(train_data_non)
 train_list_data_nagative = train.list_data(train_data_negative)
 
-
+#train -> test data
 def train_model(test_data):
       non_count = 1
       negative_count = 1
@@ -46,12 +47,22 @@ def train_model(test_data):
                   negative_count += 1
       
       return non_count, negative_count
-  
-# def probability(data1, data2):
-#   return print("%.0f%%" % (100 * abs(data2/data1))) 
+      
+#acc
+def acc(data1, data2, data3, data4):
+      return round(((data1 + data2) / (data3 + data4)), 4)
+#recall
+def recall(data1, data2, data3, data4):
+      return round(((data1 / (data1 + data2) + data4 / (data3 +data4))/2), 4)
+#precision  
+def precision(data1, data2, data3, data4):
+      return round(((data1 / (data1 + data3) + data4 / (data2 + data4))/2), 4)
 
-# non_count , negative_count = train_model(train_list_data_nagative)
+#dict unpacking 으로 데이터값 받기
+non_non, non_neg = train_model(train_list_data_non)
+neg_non, neg_neg = train_model(train_list_data_nagative)
 
-# probability(non_count, negative_count)
-print(train_model(train_list_data_non))
-print(train_model(train_list_data_nagative))
+#acc, precision, recall 출력
+print(acc(non_non, non_neg, neg_non, neg_neg))
+print(precision(non_non, non_neg, neg_non, neg_neg))
+print(recall(non_non, non_neg, neg_non, neg_neg))

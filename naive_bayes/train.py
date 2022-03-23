@@ -109,62 +109,17 @@ df_filled  = df.fillna(1)
 # 연산 값 dataframe에 추가
 df_sum = df_filled.sum(axis= 1)
 df_filled.insert(2, "sum",df_sum,True)
-
+# 
 df_non_stat = df_filled['non_negative'] / df_filled['sum']
 df_negative_stat = df_filled['negative'] / df_filled['sum']
-
+# 확률 값 추가
 df_filled.insert(3, "non_stat",df_non_stat,True)
 df_filled.insert(4, "negative_stat",df_negative_stat,True)
 
+# dataframe에서 non/neg 확률 뽑아와서 dict 만듬
 neg_dict = dict(zip(df_filled.index, df_filled.negative_stat))
 non_dict = dict(zip(df_filled.index, df_filled.non_stat))
 train_merge = merge(non_dict, neg_dict)
-
-#test data 불러오기
-f = open('/Users/ahn_euijin/lab/naive_bayes/test_non_negative.csv', encoding = 'UTF-8')
-train_data_non = csv.reader(f)
-
-f = open('/Users/ahn_euijin/lab/naive_bayes/test_negative.csv', encoding = 'UTF-8')
-train_data_negative = csv.reader(f)
-
-train_list_data_non = list_data(train_data_non)
-train_list_data_nagative = list_data(train_data_negative)
-
-
-def train_model(test_data):
-      non_count = 1
-      negative_count = 1
-      non_sum = 0
-      negative_sum = 0
-      #count = 0
-      for list in test_data:
-            a = short(list)
-            b = word_tokenize(a)
-            c = tokenizer(b)
-
-            for word in list:
-                  if word in train_merge.keys():
-                        non_sum += train_merge[word][0]
-                        negative_sum += train_merge[word][1]
-            if non_sum >=negative_sum:
-                  non_count += 1
-            else:
-                  negative_count += 1
-      
-      return non_count, negative_count
-  
-# def probability(data1, data2):
-#   return print("%.0f%%" % (100 * abs(data2/data1))) 
-
-# non_count , negative_count = train_model(train_list_data_nagative)
-
-# probability(non_count, negative_count)
-print(train_model(train_list_data_non))
-print(train_model(train_list_data_nagative))
-
-      
-
-
 
 
 
