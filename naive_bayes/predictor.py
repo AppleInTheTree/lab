@@ -36,11 +36,15 @@ def train_model(test_data):
             a = train.short(list)
             b = word_tokenize(a)
             c = train.tokenizer(b)
-
+            #list별로 단어를 각각 train모델에 있는 단어의 확률을 더해서 더 큰 쪽으로 return
             for word in list:
                   if word in train.train_merge.keys():
                         non_sum += train.train_merge[word][0]
                         negative_sum += train.train_merge[word][1]
+                  else:
+                        non_sum += 0.1
+                        negative_sum += 0.1
+            
             if non_sum >=negative_sum:
                   non_count += 1
             else:
@@ -61,7 +65,7 @@ def precision(data1, data2, data3, data4):
 #dict unpacking 으로 데이터값 받기
 non_non, non_neg = train_model(train_list_data_non)
 neg_non, neg_neg = train_model(train_list_data_nagative)
-
+print(train_model(train_list_data_non))
 #acc, precision, recall 출력
 print(acc(non_non, non_neg, neg_non, neg_neg))
 print(precision(non_non, non_neg, neg_non, neg_neg))
