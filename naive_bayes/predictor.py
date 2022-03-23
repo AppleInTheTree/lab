@@ -52,13 +52,13 @@ def train_model(test_data):
       
       return non_count, negative_count
       
-#acc
+#acc (TP / total num)
 def acc(data1, data2, data3, data4):
-      return round(((data1 + data2) / (data3 + data4)), 4)
-#recall
+      return round(((data1 + data4) / (data1 + data2 + data3 + data4)), 4)
+#recall (TP / (TP + FN))
 def recall(data1, data2, data3, data4):
       return round(((data1 / (data1 + data2) + data4 / (data3 +data4))/2), 4)
-#precision  
+#precision (TP/(TP +FP))
 def precision(data1, data2, data3, data4):
       return round(((data1 / (data1 + data3) + data4 / (data2 + data4))/2), 4)
 
