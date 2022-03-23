@@ -65,8 +65,8 @@ def precision(data1, data2, data3, data4):
 #dict unpacking 으로 데이터값 받기
 non_non, non_neg = train_model(train_list_data_non)
 neg_non, neg_neg = train_model(train_list_data_nagative)
-print(train_model(train_list_data_non))
+
 #acc, precision, recall 출력
-print(acc(non_non, non_neg, neg_non, neg_neg))
-print(precision(non_non, non_neg, neg_non, neg_neg))
-print(recall(non_non, non_neg, neg_non, neg_neg))
+print(acc(non_non, non_neg, neg_non, neg_neg)) # acc
+print(precision(non_non, non_neg, neg_non, neg_neg)) # pre
+print(recall(non_non, non_neg, neg_non, neg_neg)) # recall
