@@ -24,7 +24,6 @@ data_negative = csv.reader(d)
 #cvs파일 정제하기 위해 list로 받아오기
 def list_data(data):
       listed_data =[]
-
       for row in data:
             listed_data+=row
       return listed_data
@@ -37,7 +36,7 @@ def short(word):
       shortword = shortword = re.compile(r'\W*\b\w{1,2}\b')
       a = shortword.sub('',str(word))
       b = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]','', a)
-      return b
+      return b.lower()
 
 shortword_non = short(list_data_non)
 shortword_negative = short(list_data_negative)
@@ -104,12 +103,12 @@ df = pd.DataFrame.from_dict(merged_dict, orient='index', columns=col_names)
 
 # Nan value 제거 (smoothing)
 df_filled  = df.fillna(1)
-#print(df_filled)
+print(df_filled)
 
 # 연산 값 dataframe에 추가
 df_sum = df_filled.sum(axis= 1)
 df_filled.insert(2, "sum",df_sum,True)
-# 
+# 확률값 연산
 df_non_stat = df_filled['non_negative'] / df_filled['sum']
 df_negative_stat = df_filled['negative'] / df_filled['sum']
 # 확률 값 추가
