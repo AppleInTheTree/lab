@@ -36,7 +36,8 @@ def short(word):
       shortword = shortword = re.compile(r'\W*\b\w{1,2}\b')
       a = shortword.sub('',str(word))
       b = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]','', a)
-      return b.lower()
+      #소문자로 변환
+      return b.lower() 
 
 shortword_non = short(list_data_non)
 shortword_negative = short(list_data_negative)
@@ -103,18 +104,21 @@ df = pd.DataFrame.from_dict(merged_dict, orient='index', columns=col_names)
 
 # Nan value 제거 (smoothing)
 df_filled  = df.fillna(1)
-print(df_filled)
+#print(df_filled)
 
 # 연산 값 dataframe에 추가
 df_sum = df_filled.sum(axis= 1)
 df_filled.insert(2, "sum",df_sum,True)
+
 # 확률값 연산
 df_non_stat = df_filled['non_negative'] / df_filled['sum']
 df_negative_stat = df_filled['negative'] / df_filled['sum']
+
 # 확률 값 추가
 df_filled.insert(3, "non_stat",df_non_stat,True)
 df_filled.insert(4, "negative_stat",df_negative_stat,True)
 
+print(df_filled)
 # dataframe에서 non/neg 확률 뽑아와서 dict 만듬
 neg_dict = dict(zip(df_filled.index, df_filled.negative_stat))
 non_dict = dict(zip(df_filled.index, df_filled.non_stat))

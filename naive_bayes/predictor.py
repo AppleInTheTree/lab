@@ -31,11 +31,14 @@ def train_model(test_data):
       negative_count = 1
       non_sum = 0
       negative_sum = 0
-      #count = 0
+      # count = 0
+      # count1 = 0
       for list in test_data:
+            #count += 1
             a = train.short(list)
             b = word_tokenize(a)
             c = train.tokenizer(b)
+            #count1 += 1
             #list별로 단어를 각각 train모델에 있는 단어의 확률을 더해서 더 큰 쪽으로 return
             for word in list:
                   if word in train.train_merge.keys():
@@ -49,7 +52,7 @@ def train_model(test_data):
                   non_count += 1
             else:
                   negative_count += 1
-      
+      #print(count, count1)
       return non_count, negative_count
       
 #acc (TP / total num)
